@@ -19,7 +19,7 @@ if you do tidy something and submit a pull, i would very much appreciate it if y
 
 ### compiling 
 
-brr *should'nt* have any dependencies and *should* compile on any system without problems, but i have no clue what i'm doing, so... no promises. :^)  
+brr *shouldn't* have any dependencies and *should* compile on any system without problems, but i have no clue what i'm doing, so... no promises. :^)  
 i don't currently have any plans to package brr in any way, because, well, i haven't researched how to yet. 
 
 ### todo 
