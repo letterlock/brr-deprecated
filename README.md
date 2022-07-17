@@ -4,7 +4,7 @@
 ## the perfunctory prose proliferator 
 
 programmery provided by the passionately proficient proprietor of [viewsourcecode.org](https://viewsourcecode.org/snaptoken/kilo/01.setup.html)  
-amateurishly adapted and apprehensively altered by Maxwell Letterlock (max at letterlock dot eu)  
+amateurishly adapted and apprehensively altered by Maxwell Letterlock
 
 brr is a text editor that adapts the permanency of writing by hand or on a typewriter in order to allow the user to produce text with as few edits as neccesary, hopefully curbing the urge to constantly edit whatever they have written down.  
 it consists of an (intentionally) minimal featureset:  
@@ -24,10 +24,11 @@ i don't currently have any plans to package brr in any way, because, well, i hav
 
 ### todo 
 
-- add line numbers in margins
-- implement ability to change settings in a config file  
-
-#### possibly 
-
-- only allow brr to open named files or prompt for filename on init
-- work on single line typewriter style (scroll editor when out of bounds of one line instead of entire screen) 
+- add line numbers in left margin
+- implement ability to change settings in a config file
+- ~~open file to bottom instead of top~~
+- text wrapping instead of horizontal scrolling
+- ~~only allow brr to open named files or prompt for filename on init~~
+- work on single line typewriter style (scroll editor when out of bounds of one line instead of entire screen)
+- plugins???
+- colors and highlighting for various minimal formatting or for writing dialogue

@@ -16,7 +16,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#define BRR_VERSION "1.1.0"
+#define BRR_VERSION "1.1.1"
 #define BRR_TAB_STOP 8
 #define BRR_QUIT_TIMES 3
 #define BRR_COMMIT_TIME 5
@@ -25,7 +25,7 @@
 
 enum editorKey {
   BACKSPACE = 127,
-  ARROW_LEFT = '1000',
+  ARROW_LEFT = 1000,
   ARROW_RIGHT,
   ARROW_UP,
   ARROW_DOWN,
@@ -275,14 +275,19 @@ void editorRowDelChar(erow *row, int at) {
 }
 
 /*** editor operations ***/
+void editorCursorToEnd() {
+  if (E.cy != (E.numrows - 1)) E.cy = E.rowoff = (E.numrows - 1);
+  if (E.cy < E.numrows && E.cx != E.row[E.numrows - 1].size) E.cx = E.row[E.numrows - 1].size;
+}
+
 void editorInsertChar(int c) {
-  if (time(NULL) - E.commit_time > BRR_COMMIT_TIME) editorAutoSave(); //check how long since last commit and autosave if it was more than 5 seconds ago
+  if (time(NULL) - E.commit_time > BRR_COMMIT_TIME) editorAutoSave();
   if (E.cy == E.numrows) {
     editorInsertRow(E.numrows, "", 0);
   }
   editorRowInsertChar(&E.row[E.cy], E.cx, c);
   E.cx++;
-  E.commit_time = time(NULL); //reset commit timer
+  E.commit_time = time(NULL);
 }
 
 void editorInsertNewLine() {
@@ -344,9 +349,17 @@ char *editorRowsToString(int *buflen) {
 void editorOpen(char *filename) {
   free(E.filename);
   E.filename = strdup(filename);
-
-  FILE *fp = fopen(filename, "r");
-  if (!fp) die("fopen");
+ 
+  
+  FILE *fp;
+  
+  while((fp = fopen(filename, "r")) == NULL) {
+    fp = fopen(filename, "w");
+    fprintf(fp, "%s", "\r\n");
+    fclose(fp);
+  }
+  
+  fp = fopen(filename, "r");
 
   char *line = NULL;
   size_t linecap = 0;
@@ -359,6 +372,7 @@ void editorOpen(char *filename) {
   }
   free(line);
   fclose(fp);
+  editorCursorToEnd();
   E.dirty = 0;
 }
 
@@ -413,8 +427,8 @@ void editorAutoSave() {
 
     free(buf);
     editorSetStatusMessage("can't save - io error: %s", strerror(errno));  		
-  	}
   }
+}
 
 /*** append buffer ***/
 struct abuf {
@@ -592,7 +606,7 @@ void editorMoveCursor(int key) {
 
   switch (key) {
     case ARROW_LEFT:
-      if (E.cx !=0) {
+      if (E.cx != 0) {
         E.cx--;
       } else if (E.cy > 0) {
         E.cy--;
@@ -633,6 +647,7 @@ void editorProcessKeypress() {
 
   switch (c) {
     case '\r':
+      editorCursorToEnd();
       editorInsertNewLine();
       break;
 
@@ -663,8 +678,9 @@ void editorProcessKeypress() {
     
     case BACKSPACE:
     case CTRL_KEY('h'):
-    case DEL_KEY:
-      if (c == DEL_KEY) editorMoveCursor(ARROW_RIGHT);
+    //case DEL_KEY:
+    //  if (c == DEL_KEY) editorMoveCursor(ARROW_RIGHT);
+      editorCursorToEnd();
       editorDelChar();
       break;
 
@@ -696,6 +712,7 @@ void editorProcessKeypress() {
       break;
     
     default:
+      editorCursorToEnd();
       editorInsertChar(c);
       break;
   }
@@ -726,6 +743,9 @@ int main(int argc, char *argv[]) {
   initEditor();
   if (argc >= 2) {
     editorOpen(argv[1]);
+  } else {
+    printf("please open an existing file or provide a file name (./brr [FILENAME])");
+    exit(1);
   }
 
   editorSetStatusMessage("ctrl-q = quit | ctrl-s = save");
